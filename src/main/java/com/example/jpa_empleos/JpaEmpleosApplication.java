@@ -7,6 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		buscarTodasJPAOrdenadas();
+		buscarTodasJPAPaginadas();
 	}
 
 	private void buscarTodasJPA() {
@@ -41,6 +43,14 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		List<Categoria> categorias = categoriasJPARepo.findAll(Sort.by("nombre").descending());
 
 		for (Categoria categoria : categorias) {
+			System.out.println(categoria.getId() + " " + categoria.getNombre());
+		}
+	}
+	private void buscarTodasJPAPaginadas() {
+		Page<Categoria> page = categoriasJPARepo.findAll(PageRequest.of(3, 5));
+		System.out.println("Total registros: " + page.getTotalElements());
+		System.out.println("Total paginas: " + page.getTotalPages());
+		for (Categoria categoria : page.getContent()) {
 			System.out.println(categoria.getId() + " " + categoria.getNombre());
 		}
 	}
