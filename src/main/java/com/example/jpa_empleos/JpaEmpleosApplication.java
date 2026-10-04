@@ -31,4 +31,8 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 			System.out.println(categoria.getId() + " " + categoria.getNombre());
 		}
 	}
+
+	private void borrarTodasEnBloque() {
+		categoriasJPARepo.deleteAllInBatch();
+	}
 }
