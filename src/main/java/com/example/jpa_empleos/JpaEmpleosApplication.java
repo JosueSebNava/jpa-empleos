@@ -79,17 +79,10 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	 * en la base de datos.
 	 */
 	private void buscarVacantes() {
-
-		List<Vacante> vacantes =
-				vacantesRepo.findAll();
-
+		List<Vacante> vacantes = vacantesRepo.findAll();
 		for (Vacante vacante : vacantes) {
-
-			System.out.println(
-					vacante.getId()
-							+ ". "
-							+ vacante.getNombre()
-			);
+			System.out.println(vacante.getId() + ". " + vacante.getNombre() +
+					" -> " + vacante.getCategoria().getNombre());
 		}
 	}
 
