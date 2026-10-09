@@ -46,6 +46,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 			System.out.println(categoria.getId() + " " + categoria.getNombre());
 		}
 	}
+
 	private void buscarTodasJPAPaginadas() {
 		Page<Categoria> page = categoriasJPARepo.findAll(PageRequest.of(3, 5));
 		System.out.println("Total registros: " + page.getTotalElements());
@@ -54,13 +55,31 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 			System.out.println(categoria.getId() + " " + categoria.getNombre());
 		}
 	}
+
 	private void buscarTodasJPAPaginadasOrdenadas() {
+
 		Page<Categoria> page = categoriasJPARepo.findAll(
-				PageRequest.of(0, 5, Sort.by("nombre").descending()));
-		System.out.println("Total registros: " + page.getTotalElements());
-		System.out.println("Total paginas: " + page.getTotalPages());
+				PageRequest.of(
+						0,
+						5,
+						Sort.by("nombre").descending()
+				)
+		);
+
+		System.out.println(
+				"Total registros: " + page.getTotalElements()
+		);
+
+		System.out.println(
+				"Total paginas: " + page.getTotalPages()
+		);
+
 		for (Categoria categoria : page.getContent()) {
-			System.out.println(categoria.getId() + " " + categoria.getNombre());
+			System.out.println(
+					categoria.getId()
+							+ " "
+							+ categoria.getNombre()
+			);
 		}
 	}
 }
