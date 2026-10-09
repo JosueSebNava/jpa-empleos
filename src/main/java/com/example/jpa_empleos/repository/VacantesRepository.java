@@ -1,10 +1,17 @@
 package com.example.jpa_empleos.repository;
 
 import com.example.jpa_empleos.models.Vacante;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 
-@Repository
-public interface VacantesRepository extends JpaRepository<Vacante, Integer> {
+public interface VacantesRepository
+        extends JpaRepository<Vacante, Integer> {
 
+    /*
+     * Obtiene el ID más grande actualmente
+     * registrado en la tabla Vacantes.
+     */
+    @Query("SELECT MAX(v.id) FROM Vacante v")
+    Integer obtenerUltimoId();
 }
