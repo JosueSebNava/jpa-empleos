@@ -2,10 +2,14 @@ package com.example.jpa_empleos;
 
 import com.example.jpa_empleos.models.Categoria;
 import com.example.jpa_empleos.models.EstatusVacante;
+import com.example.jpa_empleos.models.Perfil;
+import com.example.jpa_empleos.models.Usuario;
 import com.example.jpa_empleos.models.Vacante;
 
 import com.example.jpa_empleos.repository.CategoriasJPARepository;
 import com.example.jpa_empleos.repository.CategoriasRepository;
+import com.example.jpa_empleos.repository.PerfilesRepository;
+import com.example.jpa_empleos.repository.UsuarioRepository;
 import com.example.jpa_empleos.repository.VacantesRepository;
 
 import org.springframework.boot.CommandLineRunner;
@@ -16,9 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @SpringBootApplication
@@ -36,7 +39,9 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 
 	private final VacantesRepository vacantesRepo;
 
-	private final JdbcTemplate jdbcTemplate;
+	private final PerfilesRepository perfilesRepo;
+
+	private final UsuarioRepository usuarioRepo;
 
 
 	/*
@@ -49,13 +54,15 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 			CategoriasRepository categoriasRepo,
 			CategoriasJPARepository categoriasJPARepo,
 			VacantesRepository vacantesRepo,
-			JdbcTemplate jdbcTemplate
+			PerfilesRepository perfilesRepo,
+			UsuarioRepository usuarioRepo
 	) {
 
 		this.categoriasRepo = categoriasRepo;
 		this.categoriasJPARepo = categoriasJPARepo;
 		this.vacantesRepo = vacantesRepo;
-		this.jdbcTemplate = jdbcTemplate;
+		this.perfilesRepo = perfilesRepo;
+		this.usuarioRepo = usuarioRepo;
 	}
 
 
@@ -83,54 +90,105 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		/*
-		 * OPCIONES
-		 *
-		 * 1 = Consultar todas las vacantes
-		 * 2 = Guardar una nueva vacante
-		 *
-		 * Solamente cambia este número.
-		 */
-
-		int opcion = 2;
-
-
-		switch (opcion) {
-
-			case 1:
-
-				buscarVacantes();
-
-				break;
-
-
-			case 2:
-
-				guardarVacante();
-
-				break;
-
-
-			default:
-
-				System.out.println(
-						"Opcion no valida."
-				);
-
-				break;
-		}
+		crearPerfiles();
 	}
 
 
 	/*
 	 * =====================================================
-	 * BUSCAR VACANTES
+	 * CREAR PERFILES
 	 * =====================================================
 	 */
 
 	/**
-	 * Método findAll - Interfaz JpaRepository
+	 * Metodo para crear los perfiles
 	 */
+	private void crearPerfiles() {
+
+		perfilesRepo.saveAll(
+				obtenerPerfiles()
+		);
+	}
+
+
+	/*
+	 * =====================================================
+	 * OBTENER PERFILES
+	 * =====================================================
+	 */
+
+	/**
+	 * Metodo que regresa una lista de Perfiles
+	 * que se tienen en la aplicacion de empleos
+	 */
+	private List<Perfil> obtenerPerfiles() {
+
+		List<Perfil> perfiles =
+				new LinkedList<>();
+
+
+		/*
+		 * Perfil 1
+		 */
+		Perfil perfil1 =
+				new Perfil();
+
+		perfil1.setPerfil(
+				"SUPERVISOR"
+		);
+
+
+		/*
+		 * Perfil 2
+		 */
+		Perfil perfil2 =
+				new Perfil();
+
+		perfil2.setPerfil(
+				"ADMINISTRADOR"
+		);
+
+
+		/*
+		 * Perfil 3
+		 */
+		Perfil perfil3 =
+				new Perfil();
+
+		perfil3.setPerfil(
+				"USUARIO"
+		);
+
+
+		/*
+		 * Agregar perfiles a la lista
+		 */
+		perfiles.add(
+				perfil1
+		);
+
+		perfiles.add(
+				perfil2
+		);
+
+		perfiles.add(
+				perfil3
+		);
+
+
+		/*
+		 * Regresar lista
+		 */
+		return perfiles;
+	}
+
+
+	/*
+	 * =====================================================
+	 * MÉTODOS ANTERIORES DE VACANTES
+	 * =====================================================
+	 */
+
 	public void buscarVacantes() {
 
 		List<Vacante> vacantes =
@@ -190,173 +248,57 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 
 	/*
 	 * =====================================================
-	 * OBTENER ÚLTIMO ID
-	 * =====================================================
-	 */
-
-	private int obtenerSiguienteId() {
-
-		Integer ultimoId =
-				vacantesRepo.obtenerUltimoId();
-
-
-		/*
-		 * Si no existen registros,
-		 * inicia desde 1.
-		 */
-		if (ultimoId == null) {
-
-			return 1;
-		}
-
-
-		/*
-		 * Si el último es 13,
-		 * devuelve 14.
-		 */
-		return ultimoId + 1;
-	}
-
-
-	/*
-	 * =====================================================
-	 * AJUSTAR AUTO_INCREMENT
-	 * =====================================================
-	 */
-
-	private void ajustarAutoIncremento() {
-
-		int siguienteId =
-				obtenerSiguienteId();
-
-
-		/*
-		 * Ejemplo:
-		 *
-		 * Si MAX(id) = 13
-		 *
-		 * ejecuta:
-		 *
-		 * ALTER TABLE vacantes AUTO_INCREMENT = 14
-		 */
-
-		String sql =
-				"ALTER TABLE vacantes AUTO_INCREMENT = "
-						+ siguienteId;
-
-
-		jdbcTemplate.execute(sql);
-
-
-		System.out.println(
-				"Siguiente ID disponible: "
-						+ siguienteId
-		);
-	}
-
-
-	/*
-	 * =====================================================
 	 * GUARDAR VACANTE
 	 * =====================================================
 	 */
 
-	/**
-	 * Guardar una nueva vacante.
-	 */
 	public void guardarVacante() {
 
-		/*
-		 * Antes de guardar se ajusta
-		 * el AUTO_INCREMENT.
-		 */
-		ajustarAutoIncremento();
-
-
-		/*
-		 * Crear objeto Vacante.
-		 */
 		Vacante vacante =
 				new Vacante();
 
 
-		/*
-		 * Nombre
-		 */
 		vacante.setNombre(
 				"Desarrollador Java PRO"
 		);
 
 
-		/*
-		 * Descripcion
-		 */
 		vacante.setDescripcion(
 				"Se busca desarrollador con experiencia "
 						+ "en Spring Boot y JPA."
 		);
 
 
-		/*
-		 * Fecha actual
-		 */
 		vacante.setFecha(
 				new Date()
 		);
 
 
-		/*
-		 * Salario
-		 */
 		vacante.setSalario(
 				25000.0
 		);
 
 
-		/*
-		 * Estatus
-		 */
 		vacante.setEstatus(
 				EstatusVacante.Creada
 		);
 
 
-		/*
-		 * Destacado
-		 */
 		vacante.setDestacado(
 				1
 		);
 
 
-		/*
-		 * Imagen
-		 */
 		vacante.setImagen(
 				"logo_empresa.png"
 		);
 
 
-		/*
-		 * Detalles
-		 */
 		vacante.setDetalles(
 				"Trabajo remoto con horario flexible. "
 						+ "Beneficios y capacitacion incluidos."
 		);
 
-
-		/*
-		 * =================================================
-		 * CATEGORIA
-		 * =================================================
-		 *
-		 * Se utiliza una categoría existente.
-		 *
-		 * En este ejemplo:
-		 *
-		 * idCategoria = 1
-		 */
 
 		Categoria categoria =
 				new Categoria();
@@ -372,23 +314,11 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 
-		/*
-		 * =================================================
-		 * GUARDAR
-		 * =================================================
-		 */
-
 		Vacante vacanteGuardada =
 				vacantesRepo.save(
 						vacante
 				);
 
-
-		/*
-		 * =================================================
-		 * RESULTADO
-		 * =================================================
-		 */
 
 		System.out.println();
 
@@ -397,51 +327,18 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 		System.out.println(
-				"         VACANTE GUARDADA CORRECTAMENTE"
+				"VACANTE GUARDADA CORRECTAMENTE"
 		);
 
 		System.out.println(
-				"=============================================="
-		);
-
-
-		System.out.println(
-				"ID asignado: "
+				"ID: "
 						+ vacanteGuardada.getId()
 		);
-
 
 		System.out.println(
 				"Nombre: "
 						+ vacanteGuardada.getNombre()
 		);
-
-
-		System.out.println(
-				"Descripcion: "
-						+ vacanteGuardada.getDescripcion()
-		);
-
-
-		System.out.println(
-				"Salario: $"
-						+ vacanteGuardada.getSalario()
-		);
-
-
-		System.out.println(
-				"Estatus: "
-						+ vacanteGuardada.getEstatus()
-		);
-
-
-		System.out.println(
-				"Categoria ID: "
-						+ vacanteGuardada
-						.getCategoria()
-						.getId()
-		);
-
 
 		System.out.println(
 				"=============================================="
@@ -454,7 +351,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	 * MÉTODOS ANTERIORES DE CATEGORÍAS
 	 * =====================================================
 	 */
-
 
 	private void buscarTodasJPA() {
 
@@ -473,30 +369,17 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	}
 
 
-	/*
-	 * =====================================================
-	 * BORRAR TODAS LAS CATEGORÍAS
-	 * =====================================================
-	 */
-
 	private void borrarTodasEnBloque() {
 
 		categoriasJPARepo.deleteAllInBatch();
 	}
 
 
-	/*
-	 * =====================================================
-	 * BUSCAR CATEGORÍAS ORDENADAS
-	 * =====================================================
-	 */
-
 	private void buscarTodasJPAOrdenadas() {
 
 		List<Categoria> categorias =
 				categoriasJPARepo.findAll(
-						Sort.by("nombre")
-								.descending()
+						Sort.by("nombre").descending()
 				);
 
 
@@ -510,12 +393,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		}
 	}
 
-
-	/*
-	 * =====================================================
-	 * BUSCAR CATEGORÍAS PAGINADAS
-	 * =====================================================
-	 */
 
 	private void buscarTodasJPAPaginadas() {
 
@@ -554,12 +431,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	}
 
 
-	/*
-	 * =====================================================
-	 * BUSCAR CATEGORÍAS PAGINADAS Y ORDENADAS
-	 * =====================================================
-	 */
-
 	private void buscarTodasJPAPaginadasOrdenadas() {
 
 		Page<Categoria> page =
@@ -567,8 +438,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 						PageRequest.of(
 								0,
 								5,
-								Sort.by("nombre")
-										.descending()
+								Sort.by("nombre").descending()
 						)
 				);
 
