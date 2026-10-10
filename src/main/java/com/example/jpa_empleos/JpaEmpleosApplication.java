@@ -20,9 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootApplication
 public class JpaEmpleosApplication implements CommandLineRunner {
@@ -90,7 +93,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		crearPerfiles();
+		crearUsuarioConPerfiles();
 	}
 
 
@@ -100,9 +103,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	 * =====================================================
 	 */
 
-	/**
-	 * Metodo para crear los perfiles
-	 */
 	private void crearPerfiles() {
 
 		perfilesRepo.saveAll(
@@ -117,19 +117,12 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	 * =====================================================
 	 */
 
-	/**
-	 * Metodo que regresa una lista de Perfiles
-	 * que se tienen en la aplicacion de empleos
-	 */
 	private List<Perfil> obtenerPerfiles() {
 
 		List<Perfil> perfiles =
 				new LinkedList<>();
 
 
-		/*
-		 * Perfil 1
-		 */
 		Perfil perfil1 =
 				new Perfil();
 
@@ -138,9 +131,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 
-		/*
-		 * Perfil 2
-		 */
 		Perfil perfil2 =
 				new Perfil();
 
@@ -149,9 +139,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 
-		/*
-		 * Perfil 3
-		 */
 		Perfil perfil3 =
 				new Perfil();
 
@@ -160,9 +147,6 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 
-		/*
-		 * Agregar perfiles a la lista
-		 */
 		perfiles.add(
 				perfil1
 		);
@@ -176,10 +160,199 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		);
 
 
-		/*
-		 * Regresar lista
-		 */
 		return perfiles;
+	}
+
+
+	/*
+	 * =====================================================
+	 * CREAR USUARIO CON DOS PERFILES
+	 * =====================================================
+	 */
+
+	/**
+	 * Crear usuario con 2 perfiles
+	 * ADMINISTRADOR = 2
+	 * USUARIO = 3
+	 */
+	private void crearUsuarioConPerfiles() {
+
+		/*
+		 * Crear usuario
+		 */
+		Usuario nuevoUsuario =
+				new Usuario();
+
+
+		/*
+		 * Datos del usuario
+		 */
+		nuevoUsuario.setNombre(
+				"Josue Sebastian Navarrete Garcia"
+		);
+
+
+		nuevoUsuario.setEmail(
+				"navarretegarciasebas@gmail.com"
+		);
+
+
+		nuevoUsuario.setUsername(
+				"JosueGarcia"
+		);
+
+
+		nuevoUsuario.setPassword(
+				"12345"
+		);
+
+
+		nuevoUsuario.setEstatus(
+				1
+		);
+
+
+		nuevoUsuario.setFechaRegistro(
+				LocalDate.now()
+		);
+
+
+		/*
+		 * =================================================
+		 * PERFIL ADMINISTRADOR
+		 * =================================================
+		 */
+
+		Perfil perfil1 =
+				new Perfil();
+
+		perfil1.setId(
+				2
+		);
+
+
+		/*
+		 * =================================================
+		 * PERFIL USUARIO
+		 * =================================================
+		 */
+
+		Perfil perfil2 =
+				new Perfil();
+
+		perfil2.setId(
+				3
+		);
+
+
+		/*
+		 * =================================================
+		 * CREAR CONJUNTO DE PERFILES
+		 * =================================================
+		 */
+
+		Set<Perfil> perfilesUsuario =
+				new HashSet<>();
+
+
+		perfilesUsuario.add(
+				perfil1
+		);
+
+
+		perfilesUsuario.add(
+				perfil2
+		);
+
+
+		/*
+		 * Asignar perfiles al usuario
+		 */
+		nuevoUsuario.setPerfiles(
+				perfilesUsuario
+		);
+
+
+		/*
+		 * Guardar usuario
+		 */
+		Usuario usuarioGuardado =
+				usuarioRepo.save(
+						nuevoUsuario
+				);
+
+
+		/*
+		 * =================================================
+		 * RESULTADO
+		 * =================================================
+		 */
+
+		System.out.println();
+
+		System.out.println(
+				"=============================================="
+		);
+
+		System.out.println(
+				"       USUARIO GUARDADO CORRECTAMENTE"
+		);
+
+		System.out.println(
+				"=============================================="
+		);
+
+
+		System.out.println(
+				"ID: "
+						+ usuarioGuardado.getId()
+		);
+
+
+		System.out.println(
+				"Nombre: "
+						+ usuarioGuardado.getNombre()
+		);
+
+
+		System.out.println(
+				"Email: "
+						+ usuarioGuardado.getEmail()
+		);
+
+
+		System.out.println(
+				"Username: "
+						+ usuarioGuardado.getUsername()
+		);
+
+
+		System.out.println(
+				"Fecha registro: "
+						+ usuarioGuardado.getFechaRegistro()
+		);
+
+
+		System.out.println(
+				"Perfiles asignados:"
+		);
+
+
+		for (
+				Perfil perfil :
+				usuarioGuardado.getPerfiles()
+		) {
+
+			System.out.println(
+					"Perfil ID: "
+							+ perfil.getId()
+			);
+		}
+
+
+		System.out.println(
+				"=============================================="
+		);
 	}
 
 
@@ -320,28 +493,9 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 				);
 
 
-		System.out.println();
-
 		System.out.println(
-				"=============================================="
-		);
-
-		System.out.println(
-				"VACANTE GUARDADA CORRECTAMENTE"
-		);
-
-		System.out.println(
-				"ID: "
+				"Vacante guardada correctamente: "
 						+ vacanteGuardada.getId()
-		);
-
-		System.out.println(
-				"Nombre: "
-						+ vacanteGuardada.getNombre()
-		);
-
-		System.out.println(
-				"=============================================="
 		);
 	}
 
@@ -438,7 +592,8 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 						PageRequest.of(
 								0,
 								5,
-								Sort.by("nombre").descending()
+								Sort.by("nombre")
+										.descending()
 						)
 				);
 
