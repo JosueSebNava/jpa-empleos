@@ -21,11 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootApplication
 public class JpaEmpleosApplication implements CommandLineRunner {
@@ -93,15 +89,28 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		crearUsuarioConPerfiles();
+		buscarUsuario();
 	}
 
+	public void buscarUsuario() {
+		Optional<Usuario> usuarioOptional = usuarioRepo.findById(1);
+		if (usuarioOptional.isPresent()) {
+			Usuario usuario = usuarioOptional.get();
+			System.out.println("Nombre " + usuario.getNombre());
+			System.out.println("Perfiles asignados");
+			for (Perfil perfil :  usuario.getPerfiles()) {
+				System.out.println(perfil.getPerfil());
+			}
+		}
+	}
 
 	/*
 	 * =====================================================
 	 * CREAR PERFILES
 	 * =====================================================
 	 */
+
+
 
 	private void crearPerfiles() {
 
