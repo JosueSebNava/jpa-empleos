@@ -13,4 +13,6 @@ public interface VacantesRepository
     List<Vacante> findByEstatus(
             EstatusVacante estatus
     );
+    List<Vacante> findByDestacadoAndEstatusOrderByIdDesc(int destacado,
+                                                         EstatusVacante estatus);
 }
