@@ -89,7 +89,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		buscarVacantesPorDestacadoEstatus();
+		buscarVacantesSalario();
 	}
 
 	public void buscarUsuario() {
@@ -167,6 +167,33 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 			);
 		}
 	}
+
+	/**
+	 * Query Method: Buscar Vacantes rango de Salario (Between)
+	 */
+	private void buscarVacantesSalario() {
+		List<Vacante> vacantesSalariosEntre7000y14000 = vacantesRepo
+				.findBySalarioBetween(7000.0, 14000.0);
+		System.out.println("Registros encontrados: " +
+				vacantesSalariosEntre7000y14000.size());
+
+		for (Vacante vacante : vacantesSalariosEntre7000y14000) {
+			System.out.println(vacante.getId() + ": " + vacante.getNombre() + " - $" +
+					vacante.getSalario());
+		}
+
+		System.out.println("-".repeat(100));
+		List<Vacante> vacantesSalariosEntre7000y14000Desc = vacantesRepo
+				.findBySalarioBetweenOrderBySalarioDesc(7000.0, 14000.0);
+		System.out.println("Registros encontrados: " +
+				vacantesSalariosEntre7000y14000Desc.size());
+
+		for (Vacante vacante : vacantesSalariosEntre7000y14000Desc) {
+			System.out.println(vacante.getId() + ": " + vacante.getNombre() + " - $" +
+					vacante.getSalario());
+		}
+	}
+
 
 
 	private void crearPerfiles() {
