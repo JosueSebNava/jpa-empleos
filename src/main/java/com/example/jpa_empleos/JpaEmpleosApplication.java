@@ -89,7 +89,7 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		buscarVacantesSalario();
+		buscarVacantesVariosEstatus();
 	}
 
 	public void buscarUsuario() {
@@ -194,6 +194,19 @@ public class JpaEmpleosApplication implements CommandLineRunner {
 		}
 	}
 
+	private void buscarVacantesVariosEstatus(){
+		EstatusVacante[] listaEstatus = new  EstatusVacante[]{
+				EstatusVacante.Eliminada,  EstatusVacante.Creada
+		};
+		List<Vacante> vacantesVariosEstatus = vacantesRepo
+				.findByEstatusIn(listaEstatus);
+		System.out.println("Registros encontrados: " + vacantesVariosEstatus.size());
+
+		for (Vacante vacante : vacantesVariosEstatus) {
+			System.out.println(vacante.getId() + ": " + vacante.getNombre() + " - " +
+					vacante.getEstatus());
+		}
+	}
 
 
 	private void crearPerfiles() {
