@@ -9,8 +9,9 @@ import com.example.jpa_empleos.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/jpa-usuario")
@@ -77,7 +78,16 @@ public class UsuarioController {
     ) {
 
         /*
-         * Validar perfiles recibidos.
+         * Crear un conjunto donde se colocarán
+         * los perfiles existentes en la BD.
+         */
+        Set<Perfil> perfilesEncontrados =
+                new HashSet<>();
+
+
+        /*
+         * Revisar los perfiles enviados
+         * desde el JSON.
          */
         if (
                 usuario.getPerfiles() != null
@@ -85,58 +95,83 @@ public class UsuarioController {
                         !usuario.getPerfiles().isEmpty()
         ) {
 
-            for (Perfil perfil : usuario.getPerfiles()) {
+            for (
+                    Perfil perfilRecibido :
+                    usuario.getPerfiles()
+            ) {
 
-                if (
-                        perfil.getId() == null
-                                ||
-                                !perfilesRepo.existsById(
-                                        perfil.getId()
-                                )
-                ) {
+                /*
+                 * Comprobar que venga un ID.
+                 */
+                if (perfilRecibido.getId() == null) {
+
+                    return ResponseEntity
+                            .badRequest()
+                            .body(
+                                    "Todos los perfiles deben tener un ID."
+                            );
+                }
+
+
+                /*
+                 * Buscar el perfil real
+                 * en la base de datos.
+                 */
+                Optional<Perfil> perfilOptional =
+                        perfilesRepo.findById(
+                                perfilRecibido.getId()
+                        );
+
+
+                /*
+                 * Si no existe, regresar error.
+                 */
+                if (perfilOptional.isEmpty()) {
 
                     return ResponseEntity
                             .badRequest()
                             .body(
                                     "El perfil con ID "
-                                            + perfil.getId()
+                                            + perfilRecibido.getId()
                                             + " no existe."
                             );
                 }
+
+
+                /*
+                 * Agregar el perfil real
+                 * recuperado desde MySQL.
+                 */
+                perfilesEncontrados.add(
+                        perfilOptional.get()
+                );
             }
         }
 
 
+        /*
+         * Asignar al usuario los perfiles
+         * recuperados desde la BD.
+         */
+        usuario.setPerfiles(
+                perfilesEncontrados
+        );
+
+
+        /*
+         * Guardar usuario.
+         *
+         * JPA insertará el Usuario y
+         * las relaciones en UsuarioPerfil.
+         */
         Usuario usuarioGuardado =
-                usuarioRepo.save(usuario);
+                usuarioRepo.save(
+                        usuario
+                );
 
 
         return ResponseEntity.ok(
                 usuarioGuardado
-        );
-    }
-
-
-    /*
-     * =====================================================
-     * CREAR PERFILES
-     * =====================================================
-     *
-     * POST
-     * http://localhost:8080/api/jpa-usuario/perfiles
-     */
-
-    @PostMapping("/perfiles")
-    public ResponseEntity<List<Perfil>> crearPerfiles(
-            @RequestBody List<Perfil> perfiles
-    ) {
-
-        List<Perfil> perfilesGuardados =
-                perfilesRepo.saveAll(perfiles);
-
-
-        return ResponseEntity.ok(
-                perfilesGuardados
         );
     }
 }
